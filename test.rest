@@ -33,9 +33,9 @@ Content-Type: application/json
 
 ###
 
-GET http://192.168.1.251:9992/api/jenisproduk/
+GET http://192.168.1.251:9992/api/192.168.1.251:9992/api/jenisproduk
 Content-Type: application/json
-Authorization: BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1MjgzMiwiZXhwIjoxNTkzMDU2NDMyfQ.d5rX3Wlwyu-slYeEie5ha002GiMYw8V3h5YWUms_Ic8
+Authorization: BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1ODc2MywiZXhwIjoxNTkzMDYyMzYzfQ.CGAhecZhhWO9G_fn4MPQUligz6v5VreUREOCiTraK6E
 
 ###
 
@@ -60,4 +60,45 @@ Content-Type: application/json
     "keterangan": "-51111",
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1MjgzMiwiZXhwIjoxNTkzMDU2NDMyfQ.d5rX3Wlwyu-slYeEie5ha002GiMYw8V3h5YWUms_Ic8",
     "gambar": "-51111"
+}
+
+###
+
+POST http://192.168.1.251:9992/api/customer
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1ODc2MywiZXhwIjoxNTkzMDYyMzYzfQ.CGAhecZhhWO9G_fn4MPQUligz6v5VreUREOCiTraK6E",
+    "nama": "M. Syahrul Affandi",
+    "alamat": "Sidoarjo",
+    "noktp": "123",
+    "email": "csyandiie4@gmail.com",
+    "nohp": 123,
+    "idkota": 1,
+    "idpengguna": 42
+}
+
+###
+
+POST http://192.168.1.251:9992/api/provinsi
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1MjgzMiwiZXhwIjoxNTkzMDU2NDMyfQ.d5rX3Wlwyu-slYeEie5ha002GiMYw8V3h5YWUms_Ic8",
+    "nama": "M. Syahrul Affandi",
+    "keterangan": "Sidoarjo",
+    "status": "0"
+}
+
+###
+
+POST http://192.168.1.251:9992/api/kota
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1ODc2MywiZXhwIjoxNTkzMDYyMzYzfQ.CGAhecZhhWO9G_fn4MPQUligz6v5VreUREOCiTraK6E",
+    "nama": "Surabaya",
+    "keterangan": "-",
+    "status": 1,
+    "idprovinsi": 1
 }

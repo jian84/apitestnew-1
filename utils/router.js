@@ -28,7 +28,6 @@ router.get('/ceklogin', RouteIsLoginin.isLoggedIn, (req, res, next)=>{
     return res.sendStatus(201);
 });
 
-
 //LOGOUT
 router.delete('/logout', (req, res) => {
     refreshTokens = refreshTokens.filter(token => token !== req.body.token)
@@ -67,11 +66,37 @@ router.post('/newtoken', (req, res) => {
 //JENIS PRODUK
 var RouteJenisProduk = require('../controller/jenisproduk.controller');
 router.get('/jenisproduk', RouteJenisProduk.dataJenisProduk);
-router.post('/jenisproduk', RouteJenisProduk.tambahJenisProduk, (req, res) => {
-    return res.sendStatus(200);
-});
-router.put('/jenisproduk', RouteJenisProduk.ubahJenisProduk, (req, res) => {
-    return res.sendStatus(200);
-});
+router.post('/jenisproduk', RouteJenisProduk.tambahJenisProduk);
+router.put('/jenisproduk', RouteJenisProduk.ubahJenisProduk);
+
+//CUSTOMER
+var RouteCustomer = require('../controller/customer.controller');
+router.get('/customer', RouteCustomer.dataCustomer);
+router.post('/customer', RouteCustomer.tambahCustomer);
+router.put('/customer', RouteCustomer.ubahCustomer);
+
+//PROVINSI
+var RouteProvinsi = require('../controller/provinsi.controller');
+router.get('/provinsi', RouteProvinsi.dataProvinsi);
+router.post('/provinsi', RouteProvinsi.tambahProvinsi);
+router.put('/provinsi', RouteProvinsi.ubahProvinsi);
+
+//KOTA
+var RouteKota = require('../controller/kota.controller');
+router.get('/kota', RouteKota.dataKota);
+router.post('/kota', RouteKota.tambahKota);
+router.put('/kota', RouteKota.ubahkota);
+
+//KONDISI
+var RouteKondisi = require('../controller/kondisi.controller');
+router.get('/kondisi', RouteKondisi.dataKondisi);
+router.post('/kondisi', RouteKondisi.tambahKondisi);
+router.put('/kondisi', RouteKondisi.ubahKondisi);
+
+//PROMO
+var RoutePromo = require('../controller/promo.controller');
+router.get('/promo', RoutePromo.dataPromo);
+router.post('/promo', RoutePromo.tambahPromo);
+router.put('/promo', RoutePromo.ubahPromo);
 
 module.exports = router;

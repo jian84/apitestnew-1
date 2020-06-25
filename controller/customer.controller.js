@@ -3,7 +3,7 @@ var mysql = require('mysql');
 const database = require('../utils/database');
 const jwt = require('jsonwebtoken');
 
-function dataProvinsi(req, res){
+function dataCustomer(req, res){
     try{
         const token = req.headers.authorization.split(' ')[1];
         jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
@@ -11,7 +11,7 @@ function dataProvinsi(req, res){
                 res.sendStatus(401);
             }
         });
-        database.query('SELECT nama, keterangan, status FROM provinsi',
+        database.query('SELECT nama, alamat, email, noktp, nohp FROM customer where blacklist=0',
         [],
         function(error, rows, field){
             if(error){
@@ -30,22 +30,28 @@ function dataProvinsi(req, res){
     }
 }
 
-async function tambahProvinsi(req, res){
+async function tambahCustomer(req, res){
+    // const connection = await mysql.connection();
     try{
-        console.log(`Tambah Data Provinsi ${req.body.nama} ${Date.now()}...`);
+        console.log(`Tambah Data Customer ${req.body.nama} ${Date.now()}...`);
         const token = req.body.token;
         jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
             if(err){
                 res.sendStatus(401);
             }
         });
-        let provinsidata = {
+        let customerdata = {
             nama:req.body.nama,
-            keterangan:req.body.keterangan,
-            status:req.body.status
+            alamat:req.body.alamat,
+            noktp:req.body.noktp,
+            email:req.body.email,
+            nohp:req.body.nohp,
+            blacklist: 0,
+            idkota: req.body.idkota,
+            idpengguna: req.body.idpengguna
         };
         await database.query("START TRANSACTION");
-        await database.query('INSERT into provinsi set ?', provinsidata, function(err, result){
+        await database.query('INSERT into customer set ?', customerdata, function(err, result){
             if (err) throw err;
             // console.log(result.insertId);
         });
@@ -56,22 +62,27 @@ async function tambahProvinsi(req, res){
     }
 }
 
-async function ubahProvinsi(req, res){
+async function ubahCustomer(req, res){
     try{
-        console.log(`Ubah Data Provinsi ${req.body.nama} ${Date.now()}...`);
+        console.log(`Ubah Data Customer ${req.body.nama} ${Date.now()}...`);
         const token = req.body.token;
         jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
             if(err){
                 res.sendStatus(401);
             }
         });
-        let provinsidata = {
+        let customerdata = {
             nama:req.body.nama,
-            keterangan:req.body.keterangan,
-            status:req.body.status
+            alamat:req.body.alamat,
+            noktp:req.body.noktp,
+            email:req.body.email,
+            nohp:req.body.nohp,
+            blacklist: 0,
+            idkota: req.body.idkota,
+            idpengguna: req.body.idpengguna
         };
         await database.query("START TRANSACTION");
-        await database.query(`UPDATE provinsi set ? where idprovinsi= ${database.escape(req.body.idprovinsi)}`, provinsidata, function(err, result){
+        await database.query(`UPDATE customer set ? where idcustomer= ${database.escape(req.body.idcustomer)}`, customerdata, function(err, result){
             if (err) throw err;
             console.log("Ubah Data Berhasil!");
         });
@@ -83,7 +94,7 @@ async function ubahProvinsi(req, res){
 }
 
 module.exports = {
-    dataProvinsi,
-    tambahProvinsi,
-    ubahProvinsi   
+    dataCustomer,
+    tambahCustomer,
+    ubahCustomer   
 }
