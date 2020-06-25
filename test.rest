@@ -1,0 +1,63 @@
+POST http://192.168.1.251:9992/api/registrasi
+Content-Type: application/json
+
+{
+    "email": "test4@gmail.com",
+    "no_hp": "567456465741",
+    "password": "123456"
+}
+
+###
+
+POST http://192.168.1.251:9992/api/login
+Content-Type: application/json
+
+{
+    "email": "syahrul@gmail.com",
+    "password": "123456789"
+}
+
+###
+
+GET http://192.168.1.251:9992/api/ceklogin
+Authorization: BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5Mjk4MjQ0NCwiZXhwIjoxNTkyOTgyNTA0fQ.rFAxZXcgPTCKjBK_ewRxc1_j4t7b1LDJH6n10Bh0LG0
+
+###
+
+POST http://192.168.1.251:9992/api/newtoken
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5Mjk4MjQ0NCwiZXhwIjoxNTkyOTgyNTA0fQ.rFAxZXcgPTCKjBK_ewRxc1_j4t7b1LDJH6n10Bh0LG0"
+}
+
+###
+
+GET http://192.168.1.251:9992/api/jenisproduk/
+Content-Type: application/json
+Authorization: BEARER eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1MjgzMiwiZXhwIjoxNTkzMDU2NDMyfQ.d5rX3Wlwyu-slYeEie5ha002GiMYw8V3h5YWUms_Ic8
+
+###
+
+POST http://192.168.1.251:9992/api/jenisproduk
+Content-Type: application/json
+
+{
+    "nama": "yuhuu5",
+    "keterangan": "-5",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1MjgzMiwiZXhwIjoxNTkzMDU2NDMyfQ.d5rX3Wlwyu-slYeEie5ha002GiMYw8V3h5YWUms_Ic8",
+    "gambar": "-5"
+}
+
+###
+
+PUT http://192.168.1.251:9992/api/jenisproduk
+Content-Type: application/json
+
+{
+    "idjenis_produk":28,
+    "nama": "yuhuu5111",
+    "keterangan": "-51111",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InN5YWhydWxAZ21haWwuY29tIiwibm9ocCI6IjA4OTY1ODMxMDI0NCIsImlhdCI6MTU5MzA1MjgzMiwiZXhwIjoxNTkzMDU2NDMyfQ.d5rX3Wlwyu-slYeEie5ha002GiMYw8V3h5YWUms_Ic8",
+    "gambar": "-51111"
+}

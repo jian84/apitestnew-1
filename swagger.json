@@ -1,0 +1,16 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "version": "1.0.0",
+        "title": "Dokumentasi Api Horang",
+        "description": " ----- ",
+        "temOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "Dinamika Teknologi Cemerlang"
+        },
+        "license":{
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE2-0.html"
+        }
+    }
+}
