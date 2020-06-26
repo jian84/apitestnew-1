@@ -1,16 +1,1080 @@
 {
-    "openapi": "3.0.1",
+    "openapi": "3.0.0",
     "info": {
         "version": "1.0.0",
-        "title": "Dokumentasi Api Horang",
-        "description": " ----- ",
-        "temOfService": "http://swagger.io/terms/",
-        "contact": {
-            "name": "Dinamika Teknologi Cemerlang"
+        "title": "Dokumentasi REST API Gudang",
+        "description": "Dokumentasi ini untuk memudahkan proses developing",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "/api/",
+            "description": "API URL"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Customer",
+            "description": "Untuk koneksi ke Customer"
         },
-        "license":{
-            "name": "Apache 2.0",
-            "url": "https://www.apache.org/licenses/LICENSE2-0.html"
+        {
+            "name": "Jenis Produk",
+            "description": "Untuk koneksi ke Jenis Produk"
+        },
+        {
+            "name": "Kota",
+            "description": "Untuk koneksi ke Kota"
+        },
+        {
+            "name": "Kondisi",
+            "description": "Untuk koneksi ke Kondisi"
+        },
+        {
+            "name": "Pengguna",
+            "description": "Untuk koneksi ke Pengguna"
+        },
+        {
+            "name": "Provinsi",
+            "description": "Untuk koneksi ke Provinsi"
+        },
+        {
+            "name": "Produk",
+            "description": "Untuk koneksi ke Produk"
+        }
+
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/customer": {
+            "get": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Get all Customer",
+                "parameters": [
+                    {
+                        "in": "token",
+                        "name": "Authentication Token",
+                        "schema":{
+                            "type": "string",
+                            "format": "uuid",
+                            "required": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Customer"
+                ],
+                "summary": "Create a new Customer in system",
+                "requestBody": {
+                    "description": "Customer Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Customer"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/customer/{id}": {
+            "put": {
+                "summary": "Update Customer with given ID",
+                "tags": [
+                    "Customer"
+                ],
+                "requestBody": {
+                    "description": "Customer Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/uCustomer"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uCustomer"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Cat not found."
+                    }
+                }
+            }
+        },
+        "/jenisproduk": {
+            "get": {
+                "tags": [
+                    "Jenis Produk"
+                ],
+                "summary": "Get all Jenis Produk",
+                "parameters": [
+                    {
+                        "in": "token",
+                        "name": "Authentication Token",
+                        "schema":{
+                            "type": "string",
+                            "format": "uuid",
+                            "required": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Jenis Produk"
+                ],
+                "summary": "Create a new Jenis Produk in system",
+                "requestBody": {
+                    "description": "Jenis Produk Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/JenisProduk"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/jenisproduk/{id}": {
+            "put": {
+                "summary": "Update Jenis Produk with given ID",
+                "tags": [
+                    "Jenis Produk"
+                ],
+                "requestBody": {
+                    "description": "Cat Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/uJenisProduk"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uJenisProduk"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Cat not found."
+                    }
+                }
+            }
+        },
+        "/kota": {
+            "get": {
+                "tags": [
+                    "Kota"
+                ],
+                "summary": "Get all Jenis Produk",
+                "parameters": [
+                    {
+                        "in": "token",
+                        "name": "Authentication Token",
+                        "schema":{
+                            "type": "string",
+                            "format": "uuid",
+                            "required": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Kota"
+                ],
+                "summary": "Create a new Kota in system",
+                "requestBody": {
+                    "description": "Kota Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Kota"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/kota/{id}": {
+            "put": {
+                "summary": "Update Kota with given ID",
+                "tags": [
+                    "Kota"
+                ],
+                "requestBody": {
+                    "description": "Cat Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/uKota"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uJenisProduk"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Cat not found."
+                    }
+                }
+            }
+        },
+        "/kondisi": {
+            "get": {
+                "tags": [
+                    "Kondisi"
+                ],
+                "summary": "Get all Kondisi",
+                "parameters": [
+                    {
+                        "in": "token",
+                        "name": "Authentication Token",
+                        "schema":{
+                            "type": "string",
+                            "format": "uuid",
+                            "required": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Kondisi"
+                ],
+                "summary": "Create a new Kondisi in system",
+                "requestBody": {
+                    "description": "Kondisi Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Kondisi"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/kondisi/{id}": {
+            "put": {
+                "summary": "Update Kondisi with given ID",
+                "tags": [
+                    "Kondisi"
+                ],
+                "requestBody": {
+                    "description": "Cat Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/uKondisi"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uKondisi"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Cat not found."
+                    }
+                }
+            }
+        },
+        "/pengguna": {
+            "get": {
+                "tags": [
+                    "Pengguna"
+                ],
+                "summary": "Get all Pengguna",
+                "parameters": [
+                    {
+                        "in": "token",
+                        "name": "Authentication Token",
+                        "schema":{
+                            "type": "string",
+                            "format": "uuid",
+                            "required": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Pengguna"
+                ],
+                "summary": "Registrasi Pengguna",
+                "requestBody": {
+                    "description": "Pengguna Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Pengguna"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/pengguna/{id}": {
+            "put": {
+                "summary": "Update Pengguna with given ID",
+                "tags": [
+                    "Pengguna"
+                ],
+                "requestBody": {
+                    "description": "Cat Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/uPengguna"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uKondisi"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Cat not found."
+                    }
+                }
+            }
+        },
+        "/provinsi": {
+            "get": {
+                "tags": [
+                    "Provinsi"
+                ],
+                "summary": "Get all Provinsi",
+                "parameters": [
+                    {
+                        "in": "token",
+                        "name": "Authentication Token",
+                        "schema":{
+                            "type": "string",
+                            "format": "uuid",
+                            "required": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Provinsi"
+                ],
+                "summary": "Create a new Provinsi",
+                "requestBody": {
+                    "description": "Pengguna Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Provinsi"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/provinsi/{id}": {
+            "put": {
+                "summary": "Update Provinsi with given ID",
+                "tags": [
+                    "Provinsi"
+                ],
+                "requestBody": {
+                    "description": "Cat Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/uProvinsi"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uProvinsi"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Cat not found."
+                    }
+                }
+            }
+        },
+        "/produk": {
+            "get": {
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Get all Produk",
+                "parameters": [
+                    {
+                        "in": "token",
+                        "name": "Authentication Token",
+                        "schema":{
+                            "type": "string",
+                            "format": "uuid",
+                            "required": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/token"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Produk"
+                ],
+                "summary": "Create a new Produk",
+                "requestBody": {
+                    "description": "Produk Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Produk"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    }
+                }
+            }
+        },
+        "/produk/{id}": {
+            "put": {
+                "summary": "Update Produk with given ID",
+                "tags": [
+                    "Produk"
+                ],
+                "requestBody": {
+                    "description": "Produk Object",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/uProduk"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/uProduk"
+                        }
+                    },
+                    "400": {
+                        "description": "Failed. Bad post data."
+                    },
+                    "404": {
+                        "description": "Failed. Cat not found."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "token": {
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "id": {
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "Customer": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "alamat": {
+                    "type": "string"
+                },
+                "noktp": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "nohp": {
+                    "type": "string"
+                },
+                "blacklist": {
+                    "type": "boolean"
+                },
+                "verifikasi_nohp": {
+                    "type": "boolean"
+                },
+                "idkota": {
+                    "type": "integer"
+                },
+                "idpengguna": {
+                    "type": "integer"
+                }
+            }
+        },
+        "uCustomer": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "idcustomer": {
+                    "type": "string"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "alamat": {
+                    "type": "string"
+                },
+                "noktp": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "nohp": {
+                    "type": "string"
+                },
+                "blacklist": {
+                    "type": "boolean"
+                },
+                "verifikasi_nohp": {
+                    "type": "boolean"
+                },
+                "idkota": {
+                    "type": "integer"
+                },
+                "idpengguna": {
+                    "type": "integer"
+                }
+            }
+        },
+        "JenisProduk": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "gambar": {
+                    "type": "string"
+                }
+            }
+        },
+        "uJenisProduk": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "idjenis_produk": {
+                    "type": "string"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "gambar": {
+                    "type": "string"
+                }
+            }
+        },
+        "Kota": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                },
+                "idprovinsi": {
+                    "type": "integer"
+                }
+            }
+        },
+        "uKota": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "idkota": {
+                    "type": "integer"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "string"
+                },
+                "idprovinsi": {
+                    "type": "integer"
+                }
+            }
+        },
+        "Kondisi": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "presentase": {
+                    "type": "string"
+                }
+            }
+        },
+        "uKondisi": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "idkondisi": {
+                    "type": "integer"
+                },
+                "kondisi": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "presentase": {
+                    "type": "string"
+                }
+            }
+        },
+        "Pengguna": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "no_hp": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "notification_token": {
+                    "type": "string"
+                },
+                "token_mail": {
+                    "type": "string"
+                },
+                "foto": {
+                    "type": "string"
+                }
+            }
+        },
+        "uPengguna": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "idpengguna": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "no_hp": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "notification_token": {
+                    "type": "string"
+                },
+                "token_mail": {
+                    "type": "string"
+                },
+                "foto": {
+                    "type": "string"
+                }
+            },
+            "Provinsi": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    },
+                    "nama": {
+                        "type": "string"
+                    },
+                    "keterangan": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            },
+            "uProvinsi": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    },
+                    "idprovinsi": {
+                        "type": "integer"
+                    },
+                    "nama": {
+                        "type": "string"
+                    },
+                    "keterangan": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "Produk": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "kode": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "idjenis_produk": {
+                    "type": "integer"
+                },
+                "tanggal_pembuatan": {
+                    "type": "date"
+                },
+                "tanggal_pemasangan": {
+                    "type": "date"
+                },
+                "idlokasi": {
+                    "type": "integer"
+                },
+
+                "idkondisi": {
+                    "type": "integer"
+                },
+                "gambar": {
+                    "type": "string"
+                }
+            }
+        },
+        "uProduk": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "idproduk": {
+                    "type": "integer"
+                },
+                "kode": {
+                    "type": "string"
+                },
+                "keterangan": {
+                    "type": "string"
+                },
+                "idjenis_produk": {
+                    "type": "integer"
+                },
+                "tanggal_pembuatan": {
+                    "type": "date"
+                },
+                "tanggal_pemasangan": {
+                    "type": "date"
+                },
+                "idlokasi": {
+                    "type": "integer"
+                },
+
+                "idkondisi": {
+                    "type": "integer"
+                },
+                "gambar": {
+                    "type": "string"
+                }
+            }
+        },
+        "Cats": {
+            "type": "object",
+            "properties": {
+                "cats": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/Cat"
+                    }
+                }
+            }
         }
     }
 }

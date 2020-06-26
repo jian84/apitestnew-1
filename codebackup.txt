@@ -1,0 +1,60 @@
+/------/ GET WITH ID SWAGGER CODE DOCUMENTATION /------/
+"get": {
+    "tags": [
+        "Jenis Produk"
+    ],
+    "summary": "Get Jenis Produk with given ID",
+    "parameters": [
+        {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Cat with id",
+            "schema": {
+                "$ref": "#/definitions/id"
+            }
+        }
+    ],
+    "responses": {
+        "200": {
+            "description": "OK",
+            "schema": {
+                "$ref": "#/definitions/Cat"
+            }
+        },
+        "404": {
+            "description": "Failed. Cat not found."
+        }
+    }
+},
+/------/ END GET WITH ID SWAGGER CODE DOCUMENTATION /------/
+/------/ DELETE DATA SWAGGER CODE DOCUMENTATION /------/
+"delete": {
+    "summary": "Delete cat with given ID",
+    "tags": [
+        "Jenis Produk"
+    ],
+    "parameters": [
+        {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Delete Cat with id",
+            "schema": {
+                "$ref": "#/definitions/id"
+            }
+        }
+    ],
+    "responses": {
+        "200": {
+            "description": "OK",
+            "schema": {
+                "$ref": "#/definitions/id"
+            }
+        },
+        "404": {
+            "description": "Failed. Cat not found."
+        }
+    }
+}
+/------/ END DELETE DATA SWAGGER CODE DOCUMENTATION /------/
