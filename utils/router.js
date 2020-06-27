@@ -5,16 +5,9 @@ const express = require('express');
 const router = express.Router();
 global.refreshTokens = []
 
-//MIDDLEWARE
-const penggunaMiddleware = require('../middleware/registrasi.middleware');
+//HOME API
 router.get('/', function(req, res){
     res.json({"message": "Selamat Datang"});
-});
-
-//PENGGUNA
-var RouteToReistrasiController = require('../controller/pengguna.controller');
-router.post('/registrasi', penggunaMiddleware.validateRegistrasi, function(req, res) {
-    RouteToReistrasiController.controllerRegistrasi(req, res)
 });
 
 //LOGIN
@@ -39,6 +32,7 @@ var RouteToVerifyEmailController = require('../controller/emailverification.cont
 router.get('/verify_email', function(req, res){
     RouteToVerifyEmailController.ControllerEmailverification(req, res)
 });
+
 //NEW TOKEN GENERATOR
 router.post('/newtoken', (req, res) => {
     const refreshToken = req.body.token;
@@ -63,40 +57,92 @@ router.post('/newtoken', (req, res) => {
     })
 });
 
+//PENGGUNA
+var RouteReistrasi = require('../controller/pengguna.controller');
+router.post('/registrasi', RouteReistrasi.Registrasi, (req, res, next) => {
+    return res.sendStatus(200);
+});
+
 //JENIS PRODUK
 var RouteJenisProduk = require('../controller/jenisproduk.controller');
-router.get('/jenisproduk', RouteJenisProduk.dataJenisProduk);
-router.post('/jenisproduk', RouteJenisProduk.tambahJenisProduk);
-router.put('/jenisproduk', RouteJenisProduk.ubahJenisProduk);
+router.get('/jenisproduk', RouteJenisProduk.dataJenisProduk, (req, res, next) => {
+    if(req.kode == 201){
+        // console.log("----"+req.dataPengguna.idpengguna);
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/jenisproduk', RouteJenisProduk.tambahJenisProduk, (req, res, next) => {
+    return res.sendStatus(200);
+});
+router.put('/jenisproduk', RouteJenisProduk.ubahJenisProduk, (req, res, next) => {
+    return res.statusCode(200);
+});
 
 //CUSTOMER
 var RouteCustomer = require('../controller/customer.controller');
-router.get('/customer', RouteCustomer.dataCustomer);
-router.post('/customer', RouteCustomer.tambahCustomer);
-router.put('/customer', RouteCustomer.ubahCustomer);
+router.get('/customer', RouteCustomer.dataCustomer, (req, res, next) => {
+    if(req.kode == 201){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/customer', RouteCustomer.tambahCustomer, (req, res, next) => {
+    return res.sendStatus(200);
+});
+router.put('/customer', RouteCustomer.ubahCustomer, (req, res, next) => {
+    return res.sendStatus(200);
+});
 
 //PROVINSI
 var RouteProvinsi = require('../controller/provinsi.controller');
-router.get('/provinsi', RouteProvinsi.dataProvinsi);
-router.post('/provinsi', RouteProvinsi.tambahProvinsi);
-router.put('/provinsi', RouteProvinsi.ubahProvinsi);
+router.get('/provinsi', RouteProvinsi.dataProvinsi, (req, res, next) => {
+    if(req.kode == 201){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/provinsi', RouteProvinsi.tambahProvinsi, (req, res, next) => {
+    return res.sendStatus(200);
+});
+router.put('/provinsi', RouteProvinsi.ubahProvinsi, (req, res, next) => {
+    return res.sendStatus(200);
+});
 
 //KOTA
 var RouteKota = require('../controller/kota.controller');
-router.get('/kota', RouteKota.dataKota);
-router.post('/kota', RouteKota.tambahKota);
-router.put('/kota', RouteKota.ubahkota);
+router.get('/kota', RouteKota.dataKota, (req, res, next) => {
+    if(req.kode == 201){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/kota', RouteKota.tambahKota, (req, res) => {
+    console.log(req.kode);
+    return res.sendStatus(req.kode);
+});
+router.put('/kota', RouteKota.ubahkota, (req, res, next) => {
+    return res.sendStatus(200);
+});
 
 //KONDISI
 var RouteKondisi = require('../controller/kondisi.controller');
-router.get('/kondisi', RouteKondisi.dataKondisi);
-router.post('/kondisi', RouteKondisi.tambahKondisi);
-router.put('/kondisi', RouteKondisi.ubahKondisi);
-
-//PROMO
-var RoutePromo = require('../controller/promo.controller');
-router.get('/promo', RoutePromo.dataPromo);
-router.post('/promo', RoutePromo.tambahPromo);
-router.put('/promo', RoutePromo.ubahPromo);
+router.get('/kondisi', RouteKondisi.dataKondisi, (req, res, next) => {
+    if(req.kode == 201){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/kondisi', RouteKondisi.tambahKondisi, (req, res, next) => {
+    return res.sendStatus(200);
+});
+router.put('/kondisi', RouteKondisi.ubahKondisi, (req, res, next) => {
+    return res.sendStatus(200);
+});
 
 module.exports = router;

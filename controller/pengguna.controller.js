@@ -9,22 +9,15 @@ const crypto = require('crypto');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API);
 
-async function controllerRegistrasi(req, res){
+async function Registrasi(req, res, next){
     console.log("Transaksi Registrasi : "+req.body.email);
     try{
-        // const token = req.body.token;
-        // jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-        //     if(err){
-        //         res.sendStatus(401);
-        //     }
-        // });
         await database.query("START TRANSACTION");
-        database.query(
+        await database.query(
             `SELECT email, no_hp, password FROM pengguna WHERE email=${database.escape(req.body.email)} OR no_hp=${database.escape(req.body.no_hp)};`,
             (err, result) => {
                 console.log("yuhuuu"+result.length);
                 if(result.length){
-                    console.log("Email atau Nomor Handphone yang anda masukkan sudah terdaftar!");
                     return res.status(409).send({
                         message: 'Email atau Nomor Handphone yang anda masukkan sudah terdaftar!'
                     });
@@ -47,7 +40,7 @@ async function controllerRegistrasi(req, res){
                                         });
                                     }
     
-                                    var userVerificationURL = 'http://localhost:'+process.env.APP_PORT+'/api/verify_email?token=' + auth_token;
+                                    var userVerificationURL = 'http://' + process.env.DB_HOST + ':'+process.env.APP_PORT+'/api/verify_email?token=' + auth_token;
                                     console.log(userVerificationURL);
                                     const message = {
                                         to: req.body.email,
@@ -74,13 +67,15 @@ async function controllerRegistrasi(req, res){
             }
         );
         await database.query("COMMIT");
+        next();
     }catch(err){
         await database.query("ROLLBACK");
         console.log("Rollback");
+        next();
     }
     
 }
 
 module.exports= {
-    controllerRegistrasi
+    Registrasi
 }

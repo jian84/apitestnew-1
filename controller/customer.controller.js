@@ -6,40 +6,31 @@ const jwt = require('jsonwebtoken');
 function dataCustomer(req, res){
     try{
         const token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
-        database.query('SELECT nama, alamat, email, noktp, nohp FROM customer where blacklist=0',
+        const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+        database.query('SELECT idcustomer, nama, alamat, email, noktp, nohp FROM customer where blacklist=0',
         [],
         function(error, rows, field){
             if(error){
-                res.send(400).send({
-                    message: 'Ada masalah'
-                });
+                req.kode = 400;
+                req.message = "Sorry, something went wrong";
+                next();
             }else{
-                res.send(rows);
+                req.kode = 201;
+                req.data = rows;
+                next();
             }
         });
     }catch(err){
-        return res.status(401).send({
-            statuscode:408,
-            message: 'Sesi anda tidak valid'
-        });
+        req.kode = 403;
+        next();
     }
 }
 
 async function tambahCustomer(req, res){
-    // const connection = await mysql.connection();
     try{
         console.log(`Tambah Data Customer ${req.body.nama} ${Date.now()}...`);
         const token = req.body.token;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
+        const decode = jwt.verify(token, process.env.ACCESS_SECRET);
         let customerdata = {
             nama:req.body.nama,
             alamat:req.body.alamat,
@@ -48,7 +39,7 @@ async function tambahCustomer(req, res){
             nohp:req.body.nohp,
             blacklist: 0,
             idkota: req.body.idkota,
-            idpengguna: req.body.idpengguna
+            idpengguna: decode.idpengguna
         };
         await database.query("START TRANSACTION");
         await database.query('INSERT into customer set ?', customerdata, function(err, result){

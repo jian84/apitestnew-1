@@ -3,34 +3,30 @@ var mysql = require('mysql');
 const database = require('../utils/database');
 const jwt = require('jsonwebtoken');
 
-function dataKota(req, res){
+function dataKota(req, res, next){
     try{
         const token = req.headers.authorization.split(' ')[1];
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
+        const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
         database.query('SELECT k.nama, k.keterangan, p.nama as provinsi FROM kota k, provinsi p where k.idprovinsi=p.idprovinsi and k.status=1',
         [],
         function(error, rows, field){
             if(error){
-                res.send(400).send({
-                    message: 'Ada masalah'
-                });
+                req.kode = 400;
+                req.message = "Sorry, something went wrong";
+                next();
             }else{
-                res.send(rows);
+                req.kode = 201;
+                req.data = rows;
+                next();
             }
         });
     }catch(err){
-        return res.status(401).send({
-            statuscode:408,
-            message: 'Sesi anda tidak valid'
-        });
+        req.kode = 403;
+        next();
     }
 }
 
-async function tambahKota(req, res){
+async function tambahKota(req, res, next){
     try{
         console.log(`Tambah Data Kota ${req.body.nama} ${Date.now()}...`);
         const token = req.body.token;
@@ -51,13 +47,16 @@ async function tambahKota(req, res){
             // console.log(result.insertId);
         });
         await database.query("COMMIT");
+        req.kode=201;
+        next();
      }catch(err){
          await database.query("ROLLBACK");
          console.log("Rollback");
+         next();
     }
 }
 
-async function ubahkota(req, res){
+async function ubahkota(req, res, next){
     try{
         console.log(`Ubah Data Kota ${req.body.nama} ${Date.now()}...`);
         const token = req.body.token;
@@ -78,9 +77,12 @@ async function ubahkota(req, res){
             console.log("Ubah Data Berhasil!");
         });
         await database.query("COMMIT");
+        req.kode = 201;
+        next();
     }catch(err){
         await database.query("ROLLBACK");
         console.log("Rollback", err);
+        next();
     }
 }
 

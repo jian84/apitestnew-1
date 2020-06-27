@@ -9,7 +9,7 @@ const database = require('../utils/database');
 function controllerLogin(req, res){
     console.log("Transaksi Login : "+req.body.email);
     database.query(
-        `SELECT email, no_hp, password FROM pengguna WHERE email=${database.escape(req.body.email)} OR no_hp=${database.escape(req.body.no_hp)};`,
+        `SELECT idpengguna, email, no_hp, password FROM pengguna WHERE email=${database.escape(req.body.email)} OR no_hp=${database.escape(req.body.no_hp)};`,
         (err, result) => {
             if(err){
                 throw err;
@@ -35,12 +35,11 @@ function controllerLogin(req, res){
                     if(eResult){
                         //Output Result
                         const user = {
-                            idpengguna: result[0].idpengguna,
-                            email: result[0].email,
-                            nohp: result[0].no_hp
+                            idpengguna: result[0].idpengguna
                         };
                         const token = generateToken(user);
-                        const refresh_token = jwt.sign({idpengguna:result[0].idpengguna, akses:result[0].akses}, process.env.REFRESH_SECRET, {expiresIn: '7d'})
+                        // const refresh_token = jwt.sign({idpengguna:result[0].idpengguna, akses:result[0].akses}, process.env.REFRESH_SECRET, {expiresIn: '7d'})
+                        const refresh_token = jwt.sign(user, process.env.REFRESH_SECRET, {expiresIn: '7d'})
                         refreshTokens.push(refresh_token)
                         return res.status(200).send({
                             message: 'Anda Berhasil Login',
