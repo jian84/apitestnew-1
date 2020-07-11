@@ -3,19 +3,18 @@ var mysql = require('mysql');
 const database = require('../utils/database');
 const jwt = require('jsonwebtoken');
 
-function dataCustomer(req, res){
+function dataCustomer(req, res, next){
     try{
         const token = req.headers.authorization.split(' ')[1];
         const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-        database.query('SELECT idcustomer, nama, alamat, email, noktp, nohp FROM customer where blacklist=0',
+        database.query('SELECT idcustomer, nama_customer, alamat, noktp FROM customer where blacklist=0',
         [],
         function(error, rows, field){
             if(error){
-                req.kode = 400;
-                req.message = "Sorry, something went wrong";
+                req.kode = 204;
                 next();
             }else{
-                req.kode = 201;
+                req.kode = 202;
                 req.data = rows;
                 next();
             }
@@ -26,61 +25,68 @@ function dataCustomer(req, res){
     }
 }
 
-async function tambahCustomer(req, res){
-    try{
-        console.log(`Tambah Data Customer ${req.body.nama} ${Date.now()}...`);
-        const token = req.body.token;
-        const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-        let customerdata = {
-            nama:req.body.nama,
-            alamat:req.body.alamat,
-            noktp:req.body.noktp,
-            email:req.body.email,
-            nohp:req.body.nohp,
-            blacklist: 0,
-            idkota: req.body.idkota,
-            idpengguna: decode.idpengguna
-        };
-        await database.query("START TRANSACTION");
-        await database.query('INSERT into customer set ?', customerdata, function(err, result){
-            if (err) throw err;
-            // console.log(result.insertId);
-        });
-        await database.query("COMMIT");
-     }catch(err){
-         await database.query("ROLLBACK");
-         console.log("Rollback");
+async function tambahCustomer(req, res, next){
+    if(Object.keys(req.body).length != 7){
+        req.kode = 405;
+        next();
+    }else{
+        try{
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let customerdata = {
+                nama_customer: req.body.nama_customer,
+                alamat: req.body.alamat,
+                noktp: req.body.noktp,
+                blacklist: req.body.blacklist,
+                idkota: req.body.idkota,
+                idpengguna: decode.idpengguna
+            };
+            await database.query("START TRANSACTION");
+            await database.query('INSERT into customer set ?', customerdata, function(err, result){
+                if (err) throw err;
+            });
+            await database.query("COMMIT");
+            console.log(`Tambah Data Customer ${req.body.nama}`);
+            req.kode = 201;
+            next();
+        }catch(err){
+            await database.query("ROLLBACK");
+            req.kode = 401;
+            next();
+        }
     }
 }
 
-async function ubahCustomer(req, res){
-    try{
-        console.log(`Ubah Data Customer ${req.body.nama} ${Date.now()}...`);
-        const token = req.body.token;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
-        let customerdata = {
-            nama:req.body.nama,
-            alamat:req.body.alamat,
-            noktp:req.body.noktp,
-            email:req.body.email,
-            nohp:req.body.nohp,
-            blacklist: 0,
-            idkota: req.body.idkota,
-            idpengguna: req.body.idpengguna
-        };
-        await database.query("START TRANSACTION");
-        await database.query(`UPDATE customer set ? where idcustomer= ${database.escape(req.body.idcustomer)}`, customerdata, function(err, result){
-            if (err) throw err;
-            console.log("Ubah Data Berhasil!");
-        });
-        await database.query("COMMIT");
-    }catch(err){
-        await database.query("ROLLBACK");
-        console.log("Rollback", err);
+async function ubahCustomer(req, res, next){
+    if(Object.keys(req.body).length != 8){
+        req.kode = 405;
+        next();
+    }else{
+        try{
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let customerdata = {
+                nama_customer:req.body.nama_customer,
+                alamat:req.body.alamat,
+                noktp:req.body.noktp,
+                blacklist: req.body.blacklist,
+                idkota: req.body.idkota,
+                idpengguna: decode.idpengguna
+            };
+            await database.query("START TRANSACTION");
+            await database.query(`UPDATE customer set ? where idcustomer= ${database.escape(req.body.idcustomer)}`, customerdata, function(err, result){
+                if (err) throw err;
+                console.log("Ubah Data Berhasil!");
+            });
+            await database.query("COMMIT");
+            console.log(`Ubah Data Customer ${req.body.nama}...`);
+            req.kode = 200;
+            next();
+        }catch(err){
+            await database.query("ROLLBACK");
+            req.kode = 401;
+            next();
+        }
     }
 }
 

@@ -7,15 +7,14 @@ function dataKota(req, res, next){
     try{
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.ACCESS_SECRET);
-        database.query('SELECT k.nama, k.keterangan, p.nama as provinsi FROM kota k, provinsi p where k.idprovinsi=p.idprovinsi and k.status=1',
+        database.query('SELECT k.idkota, k.nama_kota, k.keterangan, p.nama_provinsi as provinsi FROM kota k, provinsi p where k.idprovinsi=p.idprovinsi and k.status=1',
         [],
         function(error, rows, field){
             if(error){
-                req.kode = 400;
-                req.message = "Sorry, something went wrong";
+                req.kode = 204;
                 next();
             }else{
-                req.kode = 201;
+                req.kode = 202;
                 req.data = rows;
                 next();
             }
@@ -27,62 +26,63 @@ function dataKota(req, res, next){
 }
 
 async function tambahKota(req, res, next){
-    try{
-        console.log(`Tambah Data Kota ${req.body.nama} ${Date.now()}...`);
-        const token = req.body.token;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
-        let kotadata = {
-            nama:req.body.nama,
-            keterangan:req.body.keterangan,
-            status:req.body.status,
-            idprovinsi: req.body.idprovinsi
-        };
-        await database.query("START TRANSACTION");
-        await database.query('INSERT into kota set ?', kotadata, function(err, result){
-            if (err) throw err;
-            // console.log(result.insertId);
-        });
-        await database.query("COMMIT");
-        req.kode=201;
+    if(Object.keys(req.body).length != 5){
+        req.kode = 405;
         next();
-     }catch(err){
-         await database.query("ROLLBACK");
-         console.log("Rollback");
-         next();
+    }else{
+        try{
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let kotadata = {
+                nama_kota: req.body.nama_kota,
+                keterangan: req.body.keterangan,
+                status: req.body.status,
+                idprovinsi: req.body.idprovinsi
+            };
+            await database.query("START TRANSACTION");
+            await database.query('INSERT into kota set ?', kotadata, function(err, result){
+                if (err) throw err;
+                // console.log(result.insertId);
+            });
+            await database.query("COMMIT");
+            console.log(`Tambah Data Kota ${req.body.nama_kota}...`);
+            req.kode=201;
+            next();
+         }catch(err){
+            await database.query("ROLLBACK");
+            req.kode = 401;
+            next();
+        }
     }
 }
 
 async function ubahkota(req, res, next){
-    try{
-        console.log(`Ubah Data Kota ${req.body.nama} ${Date.now()}...`);
-        const token = req.body.token;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
-        let kotadata = {
-            nama:req.body.nama,
-            keterangan:req.body.keterangan,
-            status:req.body.status,
-            idprovinsi: req.body.idprovinsi
-        };
-        await database.query("START TRANSACTION");
-        await database.query(`UPDATE kota set ? where idkota= ${database.escape(req.body.idkota)}`, kotadata, function(err, result){
-            if (err) throw err;
-            console.log("Ubah Data Berhasil!");
-        });
-        await database.query("COMMIT");
-        req.kode = 201;
+    if(Object.keys(req.body).length != 6){
+        req.kode = 405;
         next();
-    }catch(err){
-        await database.query("ROLLBACK");
-        console.log("Rollback", err);
-        next();
+    }else{
+        try{
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let kotadata = {
+                nama_kota: req.body.nama_kota,
+                keterangan: req.body.keterangan,
+                status: req.body.status,
+                idprovinsi: req.body.idprovinsi
+            };
+            await database.query("START TRANSACTION");
+            await database.query(`UPDATE kota set ? where idkota= ${database.escape(req.body.idkota)}`, kotadata, function(err, result){
+                if (err) throw err;
+            });
+            await database.query("COMMIT");
+            console.log(`Ubah Data Kota ${req.body.nama_kota}...`);
+            req.kode = 200;
+            next();
+        }catch(err){
+            await database.query("ROLLBACK");
+            console.log("Rollback", err);
+            next();
+        }
     }
 }
 

@@ -8,15 +8,14 @@ function dataKondisi(req, res, next){
         const token = req.headers.authorization.split(' ')[1];
         const decode = jwt.verify(token, process.env.ACCESS_SECRET);
         
-        database.query('SELECT kondisi, keterangan, presentase FROM kondisi',
+        database.query('SELECT idkondisi, kondisi, keterangan, persentase FROM kondisi',
         [],
         function(error, rows, field){
             if(error){
-                req.kode = 400;
-                req.message = "Sorry, something went wrong";
+                req.kode = 204;
                 next();
             }else{
-                req.kode = 201;
+                req.kode = 202;
                 req.data = rows;
                 next();
             }
@@ -24,68 +23,68 @@ function dataKondisi(req, res, next){
     }catch(err){
         req.kode = 403;
         next();
-        return res.status(401).send({
-            statuscode:408,
-            message: 'Sesi anda tidak valid'
-        });
     }
 }
 
 async function tambahKondisi(req, res, next){
-    try{
-        console.log(`Tambah Data Kondisi ${req.body.nama} ${Date.now()}...`);
-        const token = req.body.token;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
-        let kondisidata = {
-            kondisi:req.body.kondisi,
-            keterangan:req.body.keterangan,
-            presentase:req.body.presentase
-        };
-        await database.query("START TRANSACTION");
-        await database.query('INSERT into kondisi set ?', kondisidata, function(err, result){
-            if (err) throw err;
-            // console.log(result.insertId);
-        });
-        await database.query("COMMIT");
+    if(Object.keys(req.body).length != 4){
+        req.kode = 405;
         next();
-     }catch(err){
-        req.kode = 403;
-        next();
-        await database.query("ROLLBACK");
-        console.log("Rollback");
+    }else{
+        try{
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let kondisidata = {
+                kondisi: req.body.kondisi,
+                keterangan: req.body.keterangan,
+                persentase: req.body.persentase
+            };
+            await database.query("START TRANSACTION");
+            await database.query('INSERT into kondisi set ?', kondisidata, function(err, result){
+                if (err) throw err;
+            });
+            await database.query("COMMIT");
+            console.log(`Tambah Data Kondisi ${req.body.kondisi}...`);
+            req.kode = 201;
+            next();
+        }catch(err){
+            await database.query("ROLLBACK");
+            req.kode = 401;
+            next();
+        }
     }
 }
 
 async function ubahKondisi(req, res, next){
-    try{
-        console.log(`Ubah Data Kondisi ${req.body.kondisi} ${Date.now()}...`);
-        const token = req.body.token;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
-            if(err){
-                res.sendStatus(401);
-            }
-        });
-        let kondisidata = {
-            kondisi:req.body.kondisi,
-            keterangan:req.body.keterangan,
-            presentase:req.body.presentase
-        };
-        await database.query("START TRANSACTION");
-        await database.query(`UPDATE kondisi set ? where idkondisi= ${database.escape(req.body.idkondisi)}`, kondisidata, function(err, result){
-            if (err) throw err;
-            console.log("Ubah Data Berhasil!");
-        });
-        await database.query("COMMIT");
+    if(Object.keys(req.body).length != 5){
+        req.kode = 405;
         next();
-    }catch(err){
-        req.kode = 403;
-        next();
-await database.query("ROLLBACK");
-        console.log("Rollback", err);
+    }else{
+        try{
+            const token = req.body.token;
+            jwt.verify(token, process.env.ACCESS_SECRET, (err, data) => {
+                if(err){
+                    res.sendStatus(401);
+                }
+            });
+            let kondisidata = {
+                kondisi: req.body.kondisi,
+                keterangan: req.body.keterangan,
+                persentase: req.body.persentase
+            };
+            await database.query("START TRANSACTION");
+            await database.query(`UPDATE kondisi set ? where idkondisi= ${database.escape(req.body.idkondisi)}`, kondisidata, function(err, result){
+                if (err) throw err;
+            });
+            await database.query("COMMIT");
+            console.log(`Ubah Data Kondisi ${req.body.kondisi}...`);
+            req.kode = 200;
+            next();
+        }catch(err){
+            await database.query("ROLLBACK");
+            req.kode = 403;
+            next();
+        }
     }
 }
 

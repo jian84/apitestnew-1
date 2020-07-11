@@ -3,11 +3,11 @@ var mysql = require('mysql');
 const database = require('../utils/database');
 const jwt = require('jsonwebtoken');
 
-function dataProvinsi(req, res, next){
+function dataDevice(req, res, next){
     try{
         const token = req.headers.authorization.split(' ')[1];
-        const decode = jwt.verify(token, process.env.ACCESS_SECRE);
-        database.query('SELECT idprovinsi, nama_provinsi, keterangan, status FROM provinsi',
+        const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+        database.query('SELECT iddevice, kode_device, serial_device, hardware_id, ipaddress FROM device',
         [],
         function(error, rows, field){
             if(error){
@@ -25,36 +25,7 @@ function dataProvinsi(req, res, next){
     }
 }
 
-async function tambahProvinsi(req, res, next){
-    if(Object.keys(req.body).length != 4){
-        req.kode = 405;
-        next();
-    }else{
-        try{
-            const token = req.body.token;
-            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let provinsidata = {
-                nama_provinsi:req.body.nama_provinsi,
-                keterangan:req.body.keterangan,
-                status:req.body.status
-            };
-            await database.query("START TRANSACTION");
-            await database.query('INSERT into provinsi set ?', provinsidata, function(err, result){
-                if (err) throw err;
-            });
-            await database.query("COMMIT");
-            console.log(`Tambah Data Provinsi ${req.body.nama_provinsi}...`);
-            req.kode = 201;
-            next();
-         }catch(err){
-            await database.query("ROLLBACK");
-            req.kode = 401;
-            next();
-        }
-    }
-}
-
-async function ubahProvinsi(req, res, next){
+async function tambahDevice(req, res, next){
     if(Object.keys(req.body).length != 5){
         req.kode = 405;
         next();
@@ -62,29 +33,60 @@ async function ubahProvinsi(req, res, next){
         try{
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let provinsidata = {
-                nama_provinsi:req.body.nama_provinsi,
-                keterangan:req.body.keterangan,
-                status:req.body.status
+            let devicedata = {
+                kode_device: req.body.kode_device,
+                serial_device: req.body.serial_device,
+                hardware_id: req.body.hardware_id,
+                ipaddress: req.body.ipaddress
             };
             await database.query("START TRANSACTION");
-            await database.query(`UPDATE provinsi set ? where idprovinsi= ${database.escape(req.body.idprovinsi)}`, provinsidata, function(err, result){
+            await database.query('INSERT into device set ?', devicedata, function(err, result){
                 if (err) throw err;
             });
             await database.query("COMMIT");
-            console.log(`Ubah Data Provinsi ${req.body.nama}...`);
+            console.log(`Tambah Data ${req.body.kode_device}...`);
+            req.kode = 201;
+            next();
+        }catch(err){
+            await database.query("ROLLBACK");
+            req.kode = 401;
+            next();
+        }
+    }
+}
+
+async function ubahDevice(req, res, next){
+    if(Object.keys(req.body).length != 6){
+        req.kode = 405;
+        next();
+    }else{
+        try{
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let devicedata = {
+                kode_device: req.body.kode_device,
+                serial_device: req.body.serial_device,
+                hardware_id: req.body.hardware_id,
+                ipaddress: req.body.ipaddress
+            };
+            await database.query("START TRANSACTION");
+            await database.query(`UPDATE device set ? where iddevice= ${database.escape(req.body.iddevice)}`, devicedata, function(err, result){
+                if (err) throw err;
+            });
+            await database.query("COMMIT");
+            console.log(`Ubah Data Device ${req.body.kode_device}...`);
             req.kode = 200;
             next();
         }catch(err){
             await database.query("ROLLBACK");
             req.kode = 403;
             next();
-        }
+        }   
     }
 }
 
 module.exports = {
-    dataProvinsi,
-    tambahProvinsi,
-    ubahProvinsi   
+    dataDevice,
+    tambahDevice,
+    ubahDevice   
 }

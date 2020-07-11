@@ -3,11 +3,11 @@ var mysql = require('mysql');
 const database = require('../utils/database');
 const jwt = require('jsonwebtoken');
 
-function dataProvinsi(req, res, next){
+function dataLokasi(req, res, next){
     try{
         const token = req.headers.authorization.split(' ')[1];
-        const decode = jwt.verify(token, process.env.ACCESS_SECRE);
-        database.query('SELECT idprovinsi, nama_provinsi, keterangan, status FROM provinsi',
+        const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+        database.query('SELECT l.idlokasi, l.nama_lokasi, l.keterangan, l.latitude, l.longitude, k.nama_kota from lokasi l, kota k where l.idkota=k.idkota',
         [],
         function(error, rows, field){
             if(error){
@@ -25,28 +25,30 @@ function dataProvinsi(req, res, next){
     }
 }
 
-async function tambahProvinsi(req, res, next){
-    if(Object.keys(req.body).length != 4){
+async function tambahLokasi(req, res, next){
+    if(Object.keys(req.body).length != 6){
         req.kode = 405;
         next();
     }else{
         try{
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let provinsidata = {
-                nama_provinsi:req.body.nama_provinsi,
-                keterangan:req.body.keterangan,
-                status:req.body.status
+            let lokasidata = {
+                nama_lokasi: req.body.nama_lokasi,
+                keterangan: req.body.keterangan,
+                latitude: req.body.latitude,
+                longitude: req.body.longitude,
+                idkota: req.body.idkota
             };
             await database.query("START TRANSACTION");
-            await database.query('INSERT into provinsi set ?', provinsidata, function(err, result){
+            await database.query('INSERT into lokasi set ?', lokasidata, function(err, result){
                 if (err) throw err;
             });
             await database.query("COMMIT");
-            console.log(`Tambah Data Provinsi ${req.body.nama_provinsi}...`);
+            console.log(`Tambah Data Lokasi ${req.body.nama_lokasi}...`);
             req.kode = 201;
             next();
-         }catch(err){
+        }catch(err){
             await database.query("ROLLBACK");
             req.kode = 401;
             next();
@@ -54,37 +56,39 @@ async function tambahProvinsi(req, res, next){
     }
 }
 
-async function ubahProvinsi(req, res, next){
-    if(Object.keys(req.body).length != 5){
+async function ubahLokasi(req, res, next){
+    if(Object.keys(req.body).length != 7){
         req.kode = 405;
         next();
     }else{
         try{
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let provinsidata = {
-                nama_provinsi:req.body.nama_provinsi,
-                keterangan:req.body.keterangan,
-                status:req.body.status
+            let lokasidata = {
+                nama_lokasi: req.body.nama_lokasi,
+                keterangan: req.body.keterangan,
+                latitude: req.body.latitude,
+                longitude: req.body.longitude,
+                idkota: req.body.idkota
             };
             await database.query("START TRANSACTION");
-            await database.query(`UPDATE provinsi set ? where idprovinsi= ${database.escape(req.body.idprovinsi)}`, provinsidata, function(err, result){
+            await database.query(`UPDATE lokasi set ? where idlokasi= ${database.escape(req.body.idlokasi)}`, lokasidata, function(err, result){
                 if (err) throw err;
             });
             await database.query("COMMIT");
-            console.log(`Ubah Data Provinsi ${req.body.nama}...`);
+            console.log(`Ubah Data Lokasi ${req.body.nama_lokasi}...`);
             req.kode = 200;
             next();
         }catch(err){
             await database.query("ROLLBACK");
             req.kode = 403;
             next();
-        }
+        }   
     }
 }
 
 module.exports = {
-    dataProvinsi,
-    tambahProvinsi,
-    ubahProvinsi   
+    dataLokasi,
+    tambahLokasi,
+    ubahLokasi   
 }

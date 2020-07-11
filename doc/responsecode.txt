@@ -1,0 +1,15 @@
+200 = OK (untuk transaksi update/delete)
+201 = Created (untuk transaksi Insert)
+202 = Accepted (Untuk Transaksi Listview jika ada isinya)
+203 = No Content (Untuk Transaksi Listview Jika tidak ada isinya)
+
+400 = Bad Request (Untuk transaksi yang methodnya tidak sesuai)
+401 = Unauthorized (Untuk validasi token)
+403 = Forbidden (Untuk validasi token)
+404 = Not Found (Url tidak ada)
+405 = Method Not Allowed (Untuk validasi Method)
+406 = Not Acceptable (Untuk validasi Method/parameter)
+415 = Unsupported Media Type (Untuk validasi Media type)
+
+500 = Internal Server Error (Informasi Server)
+501 = Not Implemented (Informasi Server URL)

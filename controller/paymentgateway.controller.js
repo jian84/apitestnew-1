@@ -3,11 +3,11 @@ var mysql = require('mysql');
 const database = require('../utils/database');
 const jwt = require('jsonwebtoken');
 
-function dataProvinsi(req, res, next){
+function dataPaymentGateway(req, res, next){
     try{
         const token = req.headers.authorization.split(' ')[1];
-        const decode = jwt.verify(token, process.env.ACCESS_SECRE);
-        database.query('SELECT idprovinsi, nama_provinsi, keterangan, status FROM provinsi',
+        const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+        database.query('SELECT idpayment_gateway, nama_provider, token_provider, status FROM payment_gateway',
         [],
         function(error, rows, field){
             if(error){
@@ -25,7 +25,7 @@ function dataProvinsi(req, res, next){
     }
 }
 
-async function tambahProvinsi(req, res, next){
+async function tambahPaymentGateway(req, res, next){
     if(Object.keys(req.body).length != 4){
         req.kode = 405;
         next();
@@ -33,20 +33,20 @@ async function tambahProvinsi(req, res, next){
         try{
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let provinsidata = {
-                nama_provinsi:req.body.nama_provinsi,
-                keterangan:req.body.keterangan,
-                status:req.body.status
+            let paymentgatewaydata = {
+                nama_provider: req.body.nama_provider,
+                token_provider: req.body.token_provider,
+                status: req.body.status
             };
             await database.query("START TRANSACTION");
-            await database.query('INSERT into provinsi set ?', provinsidata, function(err, result){
+            await database.query('INSERT into asuransi set ?', asuransidata, function(err, result){
                 if (err) throw err;
             });
             await database.query("COMMIT");
-            console.log(`Tambah Data Provinsi ${req.body.nama_provinsi}...`);
+            console.log(`Tambah Data Asuransi...`);
             req.kode = 201;
             next();
-         }catch(err){
+        }catch(err){
             await database.query("ROLLBACK");
             req.kode = 401;
             next();
@@ -54,7 +54,7 @@ async function tambahProvinsi(req, res, next){
     }
 }
 
-async function ubahProvinsi(req, res, next){
+async function ubahPaymentGateway(req, res, next){
     if(Object.keys(req.body).length != 5){
         req.kode = 405;
         next();
@@ -62,29 +62,29 @@ async function ubahProvinsi(req, res, next){
         try{
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let provinsidata = {
-                nama_provinsi:req.body.nama_provinsi,
-                keterangan:req.body.keterangan,
-                status:req.body.status
+            let paymentgatewaydata = {
+                nama_provider: req.body.nama_provider,
+                token_provider: req.body.token_provider,
+                status: req.body.status
             };
             await database.query("START TRANSACTION");
-            await database.query(`UPDATE provinsi set ? where idprovinsi= ${database.escape(req.body.idprovinsi)}`, provinsidata, function(err, result){
+            await database.query(`UPDATE payment_gateway set ? where idpayment_gateway= ${database.escape(req.body.idpayment_gateway)}`, paymentgatewaydata, function(err, result){
                 if (err) throw err;
             });
             await database.query("COMMIT");
-            console.log(`Ubah Data Provinsi ${req.body.nama}...`);
+            console.log(`Ubah Data Asuransi ${req.body.nama_provider}...`);
             req.kode = 200;
             next();
         }catch(err){
             await database.query("ROLLBACK");
             req.kode = 403;
             next();
-        }
+        }   
     }
 }
 
 module.exports = {
-    dataProvinsi,
-    tambahProvinsi,
-    ubahProvinsi   
+    dataPaymentGateway,
+    tambahPaymentGateway,
+    ubahPaymentGateway   
 }
