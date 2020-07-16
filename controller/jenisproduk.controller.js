@@ -16,7 +16,7 @@ function dataJenisProduk(req, res, next){
                 req.kode = 204;
                 next();
             }else{
-                req.kode = 202;
+                req.kode = 200;
                 req.data = rows;
                 next();
             }

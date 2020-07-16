@@ -91,7 +91,7 @@ router.get('/verify_email', function(req, res){
 //JENIS PRODUK
 var RouteJenisProduk = require('../controller/jenisproduk.controller');
 router.get('/jenisproduk', RouteJenisProduk.dataJenisProduk, (req, res, next) => {
-    if(req.kode == 202){
+    if(req.kode == 200){
         // console.log("----"+req.dataPengguna.idpengguna);
         return res.send(req.data);
     }else{
@@ -202,6 +202,23 @@ router.put('/lokasi', RouteLokasi.ubahLokasi, (req, res, next) => {
     }
 });
 
+//MYORDER
+var RouteMyOrder = require('../controller/myorder.controller');
+router.get('/orderdet/:idorder', RouteMyOrder.detailOrder, (req, res, next) => {
+    if(req.kode == 200){
+        return res.status(200).send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.get('/mystorage', RouteMyOrder.listmystorage, (req, res, next) => {
+    if(req.kode == 200){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+
 //NEW TOKEN GENERATOR
 router.post('/newtoken', (req, res) => {
     const refreshToken = req.body.token;
@@ -229,8 +246,9 @@ router.post('/newtoken', (req, res) => {
 //ORDER
 var RouteOrder = require('../controller/order.controller');
 router.post('/order', RouteOrder.tambahOrder, (req, res, next) => {
-    if(req.kode == 201){
-        return res.sendStatus(201);
+    console.log(req.kode);
+    if(req.kode == 200){
+        return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
     }

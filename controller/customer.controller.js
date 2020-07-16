@@ -26,7 +26,7 @@ function dataCustomer(req, res, next){
 }
 
 async function tambahCustomer(req, res, next){
-    if(Object.keys(req.body).length != 7){
+    if(Object.keys(req.body).length != 6){
         req.kode = 405;
         next();
     }else{
