@@ -1,0 +1,4 @@
+/--------/ NOTE AGUSTUS /----------/
+[15-08-2020] untuk tabel produk di tambahkan field status (0. not available, 1. available, 2 spare);
+[15-08-2020] check token ketika welcome
+             lupa password dan lupa pin

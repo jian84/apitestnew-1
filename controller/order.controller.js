@@ -17,20 +17,22 @@ async function tambahOrder(req, res, next){
             const generatenoorder = Math.floor(100000000 + Math.random() * 900000000);
             var datenow = { toSqlString: function() { return 'DATE(NOW())'; } };
             await database.query("START TRANSACTION");
-            await database.query(`SELECT idproduk from produk, kondisi where produk.idkondisi=kondisi.idkondisi and produk.idkondisi=1 and idlokasi = ${req.body.idlokasi} AND idproduk NOT IN (SELECT idproduk from detail_order where  DATE_ADD(tanggal_mulai, INTERVAL jumlah_sewa DAY)<=NOW());`, [], function(err, result){
+            await database.query("SELECT idproduk from produk, kondisi where produk.idkondisi=kondisi.idkondisi and produk.idkondisi=1 and idlokasi = 1 AND idproduk NOT IN ( select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and '${database.escape(req.body.tanggal_mulai_order)}' between tanggal_mulai and tanggal_akhir UNION select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and '${database.escape(req.body.tanggal_akhir_order)}' between tanggal_mulai and tanggal_akhir);", 
+            [], function(err, result){
+                // database.query(`SELECT idproduk from produk, kondisi where produk.idkondisi=kondisi.idkondisi and produk.idkondisi=1 and idlokasi = ${req.body.idlokasi} AND idproduk NOT IN (SELECT idproduk from detail_order where  DATE_ADD(tanggal_mulai, INTERVAL jumlah_sewa DAY)<=NOW());`, [], function(err, result){
                 if (err){
                     throw err;  
-                } else{
+                }else{
                     let orderdata = {
                         no_order: "ORDR-"+generatenoorder,
                         keterangan: req.body.keterangan,
-                        total_harga: req.body.total_harga,
-                        idcustomer: req.body.idcustomer,
+                        total_harga: reeeeq.body.total_harga,
+                        idcustomer: req.body.idcustomer, 
                         tanggal_order: datenow,
                     };
                     database.query('INSERT into `order` set ?', orderdata, function(err, resultidorder){
                         if(err){
-                            throw err
+                            throw err;
                         }else{
                             let orderdetaildata = {
                                 idorder: resultidorder.insertId,
@@ -78,19 +80,6 @@ async function tambahOrder(req, res, next){
                                     req.kode = 200;
                                     req.data = "- "+idordernya;
                                     next();
-                                    // database.query('select o.idorder, p.idpembayaran, pg.idpayment_gateway, d.idproduk, o.no_order, o.total_harga, o.keterangan, d.jumlah_sewa, d.harga, p.kode_refrensi, p.nominal, pg.nama_provider, pr.kode_kontainer from `order` o, detail_order d, pembayaran p, payment_gateway pg, produk pr where o.idorder=d.idorder and pr.idproduk=d.idproduk and o.idorder=p.idorder and pg.idpayment_gateway=p.idpayment_gateway and o.idorder=?;',
-                                    // [idordernya],
-                                    // function(error, rows, field){
-                                    //     if(error){
-                                    //         req.kode = 204;
-                                    //         next();
-                                    //     }else{
-                                    //         req.kode = 200;
-                                    //         req.data = rows;
-                                    //         next();
-                                    //     }
-                                    // });
-                                    // console.log("idordernya: "+idordernya);
                                 }
                             });
                         }
@@ -98,10 +87,10 @@ async function tambahOrder(req, res, next){
                 }
             });
             await database.query("COMMIT");
-            // console.log(`Tambah Data Order...`+idordernya);
-            // req.kode = 201;
-            // req.data = idordernya;
-            // next();
+            console.log(`Tambah Data Order...`+idordernya);
+            req.kode = 201;
+            req.data = idordernya;
+            next();
         }catch(err){
             await database.query("ROLLBACK");
             req.kode = 401;
@@ -110,6 +99,21 @@ async function tambahOrder(req, res, next){
     }
 }
 
+async function unknown(req, res, next){
+    if(Object.keys(req.body).length != 8){
+        req.kode = 405;
+        next();
+    }else{
+        try{
+            //CODE HERE
+        }catch(err){
+            req.kode = 403;
+            next();
+        }
+    }
+}
+
 module.exports = {
-    tambahOrder 
+    tambahOrder,
+    unknown
 }

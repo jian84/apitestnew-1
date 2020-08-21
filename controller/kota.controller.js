@@ -14,7 +14,7 @@ function dataKota(req, res, next){
                 req.kode = 204;
                 next();
             }else{
-                req.kode = 202;
+                req.kode = 200;
                 req.data = rows;
                 next();
             }
@@ -31,6 +31,7 @@ async function tambahKota(req, res, next){
         next();
     }else{
         try{
+            req.kode = 401;
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
             let kotadata = {
@@ -39,18 +40,40 @@ async function tambahKota(req, res, next){
                 status: req.body.status,
                 idprovinsi: req.body.idprovinsi
             };
-            await database.query("START TRANSACTION");
-            await database.query('INSERT into kota set ?', kotadata, function(err, result){
-                if (err) throw err;
-                // console.log(result.insertId);
+            database.beginTransaction(function(err){
+                database.query('INSERT into kota set ?', kotadata, function(err, result){
+                    if(err){
+                        database.rollback(function() {
+                            throw err;
+                        });    
+                    }
+                    let logdata = {
+                        keterangan : "Tambah Kota",
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });       
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Menambah Kota")
+                            database.end();
+                            req.kode=201;                   
+                            next();
+                        });
+                    });
+                });
             });
-            await database.query("COMMIT");
-            console.log(`Tambah Data Kota ${req.body.nama_kota}...`);
-            req.kode=201;
-            next();
          }catch(err){
-            await database.query("ROLLBACK");
-            req.kode = 401;
+            req.kode = 403;
             next();
         }
     }
@@ -70,17 +93,40 @@ async function ubahkota(req, res, next){
                 status: req.body.status,
                 idprovinsi: req.body.idprovinsi
             };
-            await database.query("START TRANSACTION");
-            await database.query(`UPDATE kota set ? where idkota= ${database.escape(req.body.idkota)}`, kotadata, function(err, result){
-                if (err) throw err;
+            database.beginTransaction(function(err){
+                database.query(`UPDATE kota set ? where idkota= ${database.escape(req.body.idkota)}`, kotadata, function(err, result){
+                    if (err){
+                        database.rollback(function() {
+                            throw err;
+                        }); 
+                    }
+                    let logdata = {
+                        keterangan : "Ubah Koa"+result.insertId,
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Mengubah Kota")
+                            database.end();
+                            req.kode=200;
+                            next()
+                        });
+                    });
+                });
             });
-            await database.query("COMMIT");
-            console.log(`Ubah Data Kota ${req.body.nama_kota}...`);
-            req.kode = 200;
-            next();
         }catch(err){
-            await database.query("ROLLBACK");
-            console.log("Rollback", err);
+            req.kode = 403;
             next();
         }
     }

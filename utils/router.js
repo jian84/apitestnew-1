@@ -10,10 +10,13 @@ router.get('/', function(req, res){
     res.json({"message": "Selamat Datang"});
 });
 
+//AKUN
+
+
 //ASURANSI
 var RouteAsuransi = require('../controller/asuransi.controller');
 router.get('/asuransi', RouteAsuransi.dataAsuransi, (req, res, next) => {
-    if(req.kode == 202){
+    if(req.kode == 200){
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -36,7 +39,14 @@ router.put('/asuransi', RouteAsuransi.ubahAsuransi, (req, res, next) => {
 
 //CUSTOMER
 var RouteCustomer = require('../controller/customer.controller');
-router.get('/customer', RouteCustomer.dataCustomer, (req, res, next) => {
+router.get('/customerall', RouteCustomer.dataAllCustomer, (req, res, next) => {
+    if(req.kode == 202){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.get('/customer', RouteCustomer.dataCustomerCustom, (req, res, next) => {
     if(req.kode == 202){
         return res.send(req.data);
     }else{
@@ -50,7 +60,7 @@ router.post('/customer', RouteCustomer.tambahCustomer, (req, res, next) => {
         return res.sendStatus(req.kode);
     }
 });
-router.put('/customer', RouteCustomer.ubahCustomer, (req, res, next) => {
+router.post('/ecustomer', RouteCustomer.ubahCustomer, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -61,7 +71,7 @@ router.put('/customer', RouteCustomer.ubahCustomer, (req, res, next) => {
 //DEVICE
 var RouteDevice = require('../controller/device.controller');
 router.get('/device', RouteDevice.dataDevice, (req, res, next) => {
-    if(req.kode == 202){
+    if(req.kode == 200){
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -74,7 +84,7 @@ router.post('/device', RouteDevice.tambahDevice, (req, res, next) => {
         return res.sendStatus(req.kode);
     }
 });
-router.put('/device', RouteDevice.ubahDevice, (req, res, next) => {
+router.post('/edevice', RouteDevice.ubahDevice, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -88,11 +98,20 @@ router.get('/verify_email', function(req, res){
     RouteToVerifyEmailController.ControllerEmailverification(req, res)
 });
 
+//HISTORY ORDER
+var RouteHistory = require('../controller/history.controller');
+router.get('/histori', RouteHistory.dataHistoryOrder, (req, res, next) => {
+    if(req.kode == 200){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+
 //JENIS PRODUK
 var RouteJenisProduk = require('../controller/jenisproduk.controller');
 router.get('/jenisproduk', RouteJenisProduk.dataJenisProduk, (req, res, next) => {
     if(req.kode == 200){
-        // console.log("----"+req.dataPengguna.idpengguna);
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -105,8 +124,18 @@ router.post('/jenisproduk', RouteJenisProduk.tambahJenisProduk, (req, res, next)
         return res.sendStatus(req.kode);
     }
 });
-router.put('/jenisproduk', RouteJenisProduk.ubahJenisProduk, (req, res, next) => {
+router.post('/ejenisproduk', RouteJenisProduk.ubahJenisProduk, (req, res, next) => {
     if(req.kode == 200){
+        return res.sendStatus(200);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+
+//KEY 
+var RouteToKey = require('../controller/key.controller');
+router.post('/open', RouteToKey.openApps, (req, res, next)=> {
+    if(req.kode==200){
         return res.sendStatus(200);
     }else{
         return res.sendStatus(req.kode);
@@ -116,7 +145,7 @@ router.put('/jenisproduk', RouteJenisProduk.ubahJenisProduk, (req, res, next) =>
 //KONDISI
 var RouteKondisi = require('../controller/kondisi.controller');
 router.get('/kondisi', RouteKondisi.dataKondisi, (req, res, next) => {
-    if(req.kode == 202){
+    if(req.kode == 200){
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -129,7 +158,7 @@ router.post('/kondisi', RouteKondisi.tambahKondisi, (req, res, next) => {
         return res.sendStatus(req.kode);
     }
 });
-router.put('/kondisi', RouteKondisi.ubahKondisi, (req, res, next) => {
+router.post('/ekondisi', RouteKondisi.ubahKondisi, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -153,7 +182,7 @@ router.post('/kota', RouteKota.tambahKota, (req, res) => {
         return res.sendStatus(req.kode);
     }
 });
-router.put('/kota', RouteKota.ubahkota, (req, res, next) => {
+router.post('/ekota', RouteKota.ubahkota, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -181,7 +210,7 @@ router.delete('/logout', (req, res) => {
 //LOKASI
 var RouteLokasi = require('../controller/lokasi.controller');
 router.get('/lokasi', RouteLokasi.dataLokasi, (req, res, next) => {
-    if(req.kode == 202){
+    if(req.kode == 200){
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -194,7 +223,7 @@ router.post('/lokasi', RouteLokasi.tambahLokasi, (req, res, next) => {
         return res.sendStatus(req.kode);
     }
 });
-router.put('/lokasi', RouteLokasi.ubahLokasi, (req, res, next) => {
+router.post('/elokasi', RouteLokasi.ubahLokasi, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -231,7 +260,6 @@ router.post('/newtoken', (req, res) => {
     jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, pengguna) => {
         if(err){
             return res.sendStatus(403)
-
         }
         const accessToken = RouteToLoginController.generateToken({
             email: pengguna.email,
@@ -246,7 +274,13 @@ router.post('/newtoken', (req, res) => {
 //ORDER
 var RouteOrder = require('../controller/order.controller');
 router.post('/order', RouteOrder.tambahOrder, (req, res, next) => {
-    console.log(req.kode);
+    if(req.kode == 200){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/unknown', RouteOrder.unknown, (req, res, next) => {
     if(req.kode == 200){
         return res.send(req.data);
     }else{
@@ -257,7 +291,7 @@ router.post('/order', RouteOrder.tambahOrder, (req, res, next) => {
 //PAYMENT GATEWAY
 var RoutePaymentGateway = require('../controller/paymentgateway.controller');
 router.get('/paymentgateway', RoutePaymentGateway.dataPaymentGateway, (req, res, next) => {
-    if(req.kode == 202){
+    if(req.kode == 200){
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -270,7 +304,7 @@ router.post('/paymentgateway', RoutePaymentGateway.tambahPaymentGateway, (req, r
         return res.sendStatus(req.kode);
     }
 });
-router.put('/paymentgateway', RoutePaymentGateway.ubahPaymentGateway, (req, res, next) => {
+router.post('/epaymentgateway', RoutePaymentGateway.ubahPaymentGateway, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -279,8 +313,60 @@ router.put('/paymentgateway', RoutePaymentGateway.ubahPaymentGateway, (req, res,
 });
 
 //PENGGUNA
-var RouteReistrasi = require('../controller/pengguna.controller');
-router.post('/registrasi', RouteReistrasi.Registrasi, (req, res, next) => {
+var RouterPengguna = require('../controller/pengguna.controller');
+router.post('/registrasi', RouterPengguna.Registrasi, (req, res, next) => {
+    if(req.kode == 200){
+        return res.sendStatus(200);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/epengguna', RouterPengguna.ubahPengguna, (req, res, next) => {
+    if(req.kode == 201){
+        return res.sendStatus(200);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/ipin', RouterPengguna.insertPin, (req, res, next) => {
+    if(req.kode == 201){
+        return res.sendStatus(201);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/upin', RouterPengguna.ubahPin, (req, res, next) => {
+    if(req.kode == 200){
+        return res.sendStatus(200);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/ipassword', RouterPengguna.insertPassword, (req, res, next) => {
+    if(req.kode == 201){
+        return res.sendStatus(201);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/upassword', RouterPengguna.ubahPassword, (req, res, next) => {
+    if(req.kode == 200){
+        return res.sendStatus(200);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+
+//PRODUK
+var RouterProduk = require('../controller/produk.controller');
+router.post('/produk', RouterProduk.tambahProduk, (req, res, next) => {
+    if(req.kode == 201){
+        return res.sendStatus(201);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/eproduk', RouterProduk.ubahProduk, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -291,7 +377,7 @@ router.post('/registrasi', RouteReistrasi.Registrasi, (req, res, next) => {
 //PROVINSI
 var RouteProvinsi = require('../controller/provinsi.controller');
 router.get('/provinsi', RouteProvinsi.dataProvinsi, (req, res, next) => {
-    if(req.kode == 201){
+    if(req.kode == 200){
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -304,7 +390,31 @@ router.post('/provinsi', RouteProvinsi.tambahProvinsi, (req, res, next) => {
         return res.sendStatus(req.kode);
     }
 });
-router.put('/provinsi', RouteProvinsi.ubahProvinsi, (req, res, next) => {
+router.post('/eprovinsi', RouteProvinsi.ubahProvinsi, (req, res, next) => {
+    if(req.kode == 200){
+        return res.sendStatus(200);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+
+//SETTING
+var RouteSetting = require('../controller/setting.controller');
+router.get('/setting', RouteSetting.dataSetting, (req, res, next) => {
+    if(req.kode == 200){
+        return res.send(req.data);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/setting', RouteSetting.tambahSetting, (req, res, next) => {
+    if(req.kode == 201){
+        return res.sendStatus(201);
+    }else{
+        return res.sendStatus(req.kode);
+    }
+});
+router.post('/esetting', RouteSetting.ubahSetting, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{
@@ -315,7 +425,7 @@ router.put('/provinsi', RouteProvinsi.ubahProvinsi, (req, res, next) => {
 //VOUCHER
 var RouteVoucher = require('../controller/voucher.controller');
 router.get('/voucher', RouteVoucher.dataVoucher, (req, res, next) => {
-    if(req.kode == 202){
+    if(req.kode == 200){
         return res.send(req.data);
     }else{
         return res.sendStatus(req.kode);
@@ -328,7 +438,7 @@ router.post('/voucher', RouteVoucher.tambahVoucher, (req, res, next) => {
         return res.sendStatus(req.kode);
     }
 });
-router.put('/voucher', RouteVoucher.ubahVoucher, (req, res, next) => {
+router.post('/evoucher', RouteVoucher.ubahVoucher, (req, res, next) => {
     if(req.kode == 200){
         return res.sendStatus(200);
     }else{

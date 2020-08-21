@@ -3,12 +3,11 @@ var mysql = require('mysql');
 const database = require('../utils/database');
 const jwt = require('jsonwebtoken');
 
-function dataKondisi(req, res, next){
+function dataSetting(req, res, next){
     try{
         const token = req.headers.authorization.split(' ')[1];
         const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-        
-        database.query('SELECT idkondisi, kondisi, keterangan, persentase FROM kondisi',
+        database.query('SELECT * FROM setting',
         [],
         function(error, rows, field){
             if(error){
@@ -26,7 +25,7 @@ function dataKondisi(req, res, next){
     }
 }
 
-async function tambahKondisi(req, res, next){
+async function tambahSetting(req, res, next){
     if(Object.keys(req.body).length != 4){
         req.kode = 405;
         next();
@@ -35,38 +34,39 @@ async function tambahKondisi(req, res, next){
             req.kode = 401;
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let kondisidata = {
-                kondisi: req.body.kondisi,
-                keterangan: req.body.keterangan,
-                persentase: req.body.persentase
+            let settingdata = {
+                key:req.body.kode_voucher,
+                value:req.body.jumlah_voucher,
+                keterangan:req.body.persentase,
+                status:req.body.nominal
             };
-            database.beginTransaction(function(err) {
-                database.query('INSERT into kondisi set ?', kondisidata, function(err, result){
+            database.beginTransaction(function(err){
+                database.query('INSERT into setting set ?', settingdata, function(err, result){
                     if(err){
-                        database.rollback(function(){
+                        database.rollback(function() {
                             throw err;
-                        });
+                        });    
                     }
                     let logdata = {
-                        keterangan : "Tambah Kondisi"+result.insertId,
+                        keterangan : "Tambah Setting",
                         idpengguna: decode.idpengguna
                     }
                     database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
                         if(err){
                             database.rollback(function(){
                                 throw err;
-                            });
+                            });       
                         }
                         database.commit(function(err){
                             if(err){
                                 console.log("Error Commit")
                                 database.rollback(function(){
                                     throw err;
-                                });
+                                })
                             }
-                            console.log("Berhasil Menambah Kondisi")
+                            console.log("Berhasil Menambah Setting")
                             database.end();
-                            req.kode=200;
+                            req.kode=201;                   
                             next();
                         });
                     });
@@ -79,28 +79,30 @@ async function tambahKondisi(req, res, next){
     }
 }
 
-async function ubahKondisi(req, res, next){
+async function ubahSetting(req, res, next){
     if(Object.keys(req.body).length != 5){
         req.kode = 405;
         next();
     }else{
         try{
+            req.kode = 401;
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
-            let kondisidata = {
-                kondisi: req.body.kondisi,
-                keterangan: req.body.keterangan,
-                persentase: req.body.persentase
+            let settingdata = {
+                key:req.body.kode_voucher,
+                value:req.body.jumlah_voucher,
+                keterangan:req.body.persentase,
+                status:req.body.nominal
             };
             database.beginTransaction(function(err){
-                database.query(`UPDATE kondisi set ? where idkondisi= ${database.escape(req.body.idkondisi)}`, kondisidata, function(err, result){
+                database.query(`UPDATE setting set ? where idsetting= ${database.escape(req.body.idsetting)}`, settingdata, function(err, result){
                     if (err){
                         database.rollback(function() {
                             throw err;
                         }); 
                     }
                     let logdata = {
-                        keterangan : "Ubah Asuransi"+result.insertId,
+                        keterangan : "Ubah Setting"+result.insertId,
                         idpengguna: decode.idpengguna
                     }
                     database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
@@ -116,7 +118,7 @@ async function ubahKondisi(req, res, next){
                                     throw err;
                                 })
                             }
-                            console.log("Berhasil Mengubah Asuransi")
+                            console.log("Berhasil Mengubah Setting")
                             database.end();
                             req.kode=200;
                             next()
@@ -127,12 +129,12 @@ async function ubahKondisi(req, res, next){
         }catch(err){
             req.kode = 403;
             next();
-        }
+        }   
     }
 }
 
 module.exports = {
-    dataKondisi,
-    tambahKondisi,
-    ubahKondisi   
+    dataSetting,
+    tambahSetting,
+    ubahSetting 
 }

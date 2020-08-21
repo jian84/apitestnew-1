@@ -14,7 +14,7 @@ function dataPaymentGateway(req, res, next){
                 req.kode = 204;
                 next();
             }else{
-                req.kode = 202;
+                req.kode = 200;
                 req.data = rows;
                 next();
             }
@@ -38,17 +38,40 @@ async function tambahPaymentGateway(req, res, next){
                 token_provider: req.body.token_provider,
                 status: req.body.status
             };
-            await database.query("START TRANSACTION");
-            await database.query('INSERT into asuransi set ?', asuransidata, function(err, result){
-                if (err) throw err;
+            database.beginTransaction(function(err){
+                database.query('INSERT into payment_gateway set ?', asuransidata, function(err, result){
+                    if(err){
+                        database.rollback(function() {
+                            throw err;
+                        });    
+                    }
+                    let logdata = {
+                        keterangan : "Tambah Payment Gateway",
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });       
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Menambah Payment Gateway")
+                            database.end();
+                            req.kode=201;                   
+                            next();
+                        });
+                    });
+                });
             });
-            await database.query("COMMIT");
-            console.log(`Tambah Data Asuransi...`);
-            req.kode = 201;
-            next();
         }catch(err){
-            await database.query("ROLLBACK");
-            req.kode = 401;
+            req.kode = 403;
             next();
         }
     }
@@ -67,16 +90,39 @@ async function ubahPaymentGateway(req, res, next){
                 token_provider: req.body.token_provider,
                 status: req.body.status
             };
-            await database.query("START TRANSACTION");
-            await database.query(`UPDATE payment_gateway set ? where idpayment_gateway= ${database.escape(req.body.idpayment_gateway)}`, paymentgatewaydata, function(err, result){
-                if (err) throw err;
+            database.beginTransaction(function(err){
+                database.query(`UPDATE payment_gateway set ? where idpayment_gateway= ${database.escape(req.body.idpayment_gateway)}`, paymentgatewaydata, function(err, result){
+                    if (err){
+                        database.rollback(function() {
+                            throw err;
+                        }); 
+                    }
+                    let logdata = {
+                        keterangan : "Ubah Payment Gateway"+result.insertId,
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Mengubah Payment Gateway")
+                            database.end();
+                            req.kode=200;
+                            next()
+                        });
+                    });
+                });
             });
-            await database.query("COMMIT");
-            console.log(`Ubah Data Asuransi ${req.body.nama_provider}...`);
-            req.kode = 200;
-            next();
         }catch(err){
-            await database.query("ROLLBACK");
             req.kode = 403;
             next();
         }   

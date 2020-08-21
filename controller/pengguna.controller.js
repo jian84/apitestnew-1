@@ -36,7 +36,6 @@ async function Registrasi(req, res){
                                         message: err
                                     });
                                 }
-
                                 var userVerificationURL = 'http://' + process.env.DB_HOST + ':'+process.env.APP_PORT+'/api/verify_email?token=' + auth_token;
                                 console.log(userVerificationURL);
                                 const message = {
@@ -65,6 +64,294 @@ async function Registrasi(req, res){
     );
 }
 
+async function ubahPengguna(req, res, next){
+    if(Object.keys(req.body).length != 5){
+        req.kode = 405;
+        next();
+    }else{
+        try{
+            req.kode=401;
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let penggunadata = {
+                email:req.body.email,
+                no_hp:req.body.no_hp,
+                password:req.body.password,
+                status : req.body.status,
+                notification_token: req.body.notification_token, 
+                token_mail: req.body.token_mail,
+                foto: req.body.foto,
+                tipe: req.body.tipe, 
+                pin: req.body.pin
+            };
+            database.beginTransaction(function(err){
+                database.query(`UPDATE pengguna set ? where idpengguna= ${decode.idpengguna}`, penggunadata, function(err, result){
+                    if (err){
+                        database.rollback(function() {
+                            throw err;
+                        }); 
+                    }
+                    let logdata = {
+                        keterangan : "Ubah Pengguna"+result.insertId,
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Mengubah Pengguna")
+                            database.end();
+                            req.kode=200;
+                            next();
+                        });
+                    });
+                });
+            });
+        }catch(err){
+            req.kode = 403;
+            next();
+        }
+    }
+}
+
+async function insertPin(req, res, next){
+    if(Object.keys(req.body).length != 5){
+        req.kode = 405;
+        next();
+    }else{
+        try{
+            req.kode=401;
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let pindata = {
+                pin:req.body.pin
+            };
+            database.beginTransaction(function(err){
+                database.query(`UPDATE pengguna set ? where idpengguna= ${decode.idpengguna}`, pindata, function(err, result){
+                    if(err){
+                        database.rollback(function() {
+                            throw err;
+                        });    
+                    }
+                    let logdata = {
+                        keterangan : "Tambah Pin",
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });       
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Menambah Pin")
+                            database.end();
+                            req.kode=201;                   
+                            next();
+                        });
+                    });
+                });
+            });
+        }catch(err){
+            req.kode = 403;
+            next();
+        }
+    }
+}
+
+async function insertPassword(req, res, next){
+    if(Object.keys(req.body).length != 5){
+        req.kode = 405;
+        next();
+    }else{
+        try{
+            const token = req.body.token;
+            const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            let pindata = {
+                password:req.body.password
+            };
+            req.kode=401;
+            database.beginTransaction(function(err){
+                database.query(`UPDATE pengguna set ? where idpengguna= ${decode.idpengguna}`, pindata, function(err, result){
+                    if(err){
+                        database.rollback(function() {
+                            throw err;
+                        });    
+                    }
+                    let logdata = {
+                        keterangan : "Tambah Password",
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });       
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Menambah Password")
+                            database.end();
+                            req.kode=201;                   
+                            next();
+                        });
+                    });
+                });
+            });
+        }catch(err){
+            req.kode = 403;
+            next();
+        }
+    }
+}
+
+async function ubahPin(req, res, next){
+    console.log(req.body);
+    console.log(Object.keys(req.body).length);
+        if(Object.keys(req.body).length != 3){
+            req.kode = 405;
+            next();
+        }else{
+            try{
+                const token = req.body.token;
+                const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+                req.kode=401;
+                database.beginTransaction(function(err){
+                    if(err){
+                        throw err;
+                    }
+                    database.query(`SELECT password FROM pengguna where pin=${req.body.pinlama}`, (err, result) =>{
+                        if(result.length==0){
+                            return res.status(405).send({
+                                message: 'Pin anda masukkan tidak valid'
+                            });
+                        }else{
+                            database.query(`UPDATE pengguna set pin=${req.body.pinbaru} where idpengguna= ${decode.idpengguna}`, function(err, result){
+                                if (err) { 
+                                    console.log("Update Data Pin Error");
+                                    database.rollback(function() {
+                                        throw err;
+                                    });
+                                }
+                            });        
+                        }
+                        let logdata = {
+                            keterangan : "Tambah Asuransi",
+                            idpengguna: decode.idpengguna
+                        }
+                        database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                            if(err){
+                                database.rollback(function(){
+                                    throw err;
+                                });       
+                            }
+                            database.commit(function(err){
+                                if(err){
+                                    console.log("Error Commit")
+                                    database.rollback(function(){
+                                        throw err;
+                                    })
+                                }
+                                console.log("Berhasil Update Pin")
+                                database.end();
+                                req.kode=201;                   
+                                next();
+                            });
+                        });
+                    });
+                });
+            }catch(err){
+                req.kode = 403;
+                next();
+            }
+        }
+    }
+
+    async function ubahPassword(req, res, next){
+        if(Object.keys(req.body).length != 3){
+            req.kode = 405;
+            next();
+        }else{
+            try{
+                const token = req.body.token;
+                const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+                req.kode=401;
+                database.beginTransaction(function(err){
+                    if(err){
+                        throw err;
+                    }
+                    database.query(`SELECT password FROM pengguna where idpengguna=${decode.idpengguna}`, (err, result) =>{
+                        if(result.length==0){
+                            return res.status(401).send({
+                                message: 'User anda tidak valid'
+                            });
+                        }else{
+                            bcrypt.compare(
+                                req.body.passwordlama,
+                                result[0]['password'],
+                                (eErr, eResult) => {
+                                    if(eErr){
+                                        throw eErr;
+                                    }else{
+                                        database.query(`UPDATE pengguna set password=${req.body.passwordbaru} where idpengguna= ${decode.idpengguna}`, function(err, result){
+                                            if (err) { 
+                                                console.log("Update Data Password Error");
+                                                database.rollback(function() {
+                                                    throw err;
+                                                });
+                                            }
+                                        });  
+                                    }
+                                }
+                            );      
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Update Password")
+                            database.end();
+                            req.kode=201;                   
+                            next();
+                        });
+                    });
+                });
+            }catch(err){
+                req.kode = 403;
+                next();
+            }
+        }
+    }
+
+
 module.exports= {
-    Registrasi
+    Registrasi,
+    ubahPengguna,
+    insertPin,
+    insertPassword,
+    ubahPin,
+    ubahPassword
 }

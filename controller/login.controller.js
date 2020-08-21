@@ -35,6 +35,7 @@ function controllerLogin(req, res){
                         req.body.password,
                         result[0]['password'],
                         (eErr, eResult) => {
+                            console.log("Sama ??"+req.body.password+result[0]['password']);
                             if(eErr){
                                 throw eErr;
                                 return res.status(401).send({

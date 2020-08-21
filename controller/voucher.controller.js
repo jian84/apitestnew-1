@@ -8,14 +8,14 @@ function dataVoucher(req, res, next){
         const token = req.headers.authorization.split(' ')[1];
         const decode = jwt.verify(token, process.env.ACCESS_SECRET);
         console.log(decode.idpengguna);
-        database.query('SELECT idvoucher, kode_voucher, jumlah_voucher, persentase, nominal, keterangan FROM voucher',
+        database.query('SELECT idvoucher, kode_voucher, jumlah_voucher, persentase, nominal, keterangan, gambar FROM voucher',
         [],
         function(error, rows, field){
             if(error){
                 req.kode = 204;
                 next();
             }else{
-                req.kode = 202;
+                req.kode = 200;
                 req.data = rows;
                 next();
             }
@@ -32,6 +32,7 @@ async function tambahVoucher(req, res, next){
         next();
     }else{
         try{
+            req.kode = 401;
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
             let voucherdata = {
@@ -42,17 +43,40 @@ async function tambahVoucher(req, res, next){
                 keterangan:req.body.keterangan,
                 gambar:req.body.gambar
             };
-            await database.query("START TRANSACTION");
-            await database.query('INSERT into voucher set ?', voucherdata, function(err, result){
-                if (err) throw err;
+            database.beginTransaction(function(err){
+                database.query('INSERT into voucher set ?', voucherdata, function(err, result){
+                    if(err){
+                        database.rollback(function() {
+                            throw err;
+                        });    
+                    }
+                    let logdata = {
+                        keterangan : "Tambah Voucher",
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });       
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Menambah Voucher")
+                            database.end();
+                            req.kode=201;                   
+                            next();
+                        });
+                    });
+                });
             });
-            await database.query("COMMIT");
-            console.log(`Tambah Data voucher ${req.body.kode_voucher}...`);
-            req.kode = 201;
-            next();
         }catch(err){
-            await database.query("ROLLBACK");
-            req.kode = 401;
+            req.kode = 403;
             next();
         }
     }
@@ -64,6 +88,7 @@ async function ubahVoucher(req, res, next){
         next();
     }else{
         try{
+            req.kode = 401;
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
             let voucherdata = {
@@ -74,16 +99,39 @@ async function ubahVoucher(req, res, next){
                 keterangan:req.body.keterangan,
                 gambar:req.body.gambar
             };
-            await database.query("START TRANSACTION");
-            await database.query(`UPDATE voucher set ? where idvoucher= ${database.escape(req.body.idvoucher)}`, voucherdata, function(err, result){
-                if (err) throw err;
+            database.beginTransaction(function(err){
+                database.query(`UPDATE voucher set ? where idvoucher= ${database.escape(req.body.idvoucher)}`, voucherdata, function(err, result){
+                    if (err){
+                        database.rollback(function() {
+                            throw err;
+                        }); 
+                    }
+                    let logdata = {
+                        keterangan : "Ubah Voucher"+result.insertId,
+                        idpengguna: decode.idpengguna
+                    }
+                    database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
+                        if(err){
+                            database.rollback(function(){
+                                throw err;
+                            });
+                        }
+                        database.commit(function(err){
+                            if(err){
+                                console.log("Error Commit")
+                                database.rollback(function(){
+                                    throw err;
+                                })
+                            }
+                            console.log("Berhasil Mengubah Voucher")
+                            database.end();
+                            req.kode=200;
+                            next()
+                        });
+                    });
+                });
             });
-            await database.query("COMMIT");
-            console.log(`Ubah Data Jenis Produk ${req.body.kode_voucher}...`);
-            req.kode = 200;
-            next();
         }catch(err){
-            await database.query("ROLLBACK");
             req.kode = 403;
             next();
         }   
