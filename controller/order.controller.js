@@ -20,6 +20,9 @@ async function tambahOrder(req, res, next){
             var datenow = { toSqlString: function() { return 'DATE(NOW())'; } };
             database.beginTransaction(function(err){
                 if(err) { throw err; }
+
+                database.query();
+
                 database.query("SELECT idproduk from produk where idkondisi=1 and idlokasi = '${req.body.idlokasi}' and idjenis_produk='${req.body.idjenis_produk}' AND idproduk NOT IN ( select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and '${database.escape(req.body.tanggal_mulai_order)}' between tanggal_mulai and tanggal_akhir UNION select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and '${database.escape(req.body.tanggal_akhir_order)}' between tanggal_mulai and tanggal_akhir) ORDER BY idproduk asc limit 1;", 
                 [], function(err, result){
                     if(err) {
@@ -105,16 +108,28 @@ async function tambahOrder(req, res, next){
                                 });
                             }
                             
-                            database.commit(function(err){
+                            let logdata = {
+                                keterangan : "Tambah Order id : "+result.insertId,
+                                idpengguna: decode.idpengguna
+                            }
+                            database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result){
                                 if(err){
                                     database.rollback(function(){
                                         throw err;
                                     });
                                 }
-                                console.log(`Tambah Data Order...`+idordernya);
-                                req.kode = 201;
-                                req.data = idordernya;
-                                next();                    
+                                database.commit(function(err){
+                                    if(err){
+                                        console.log("Error Commit")
+                                        database.rollback(function(){
+                                            throw err;
+                                        })
+                                    }
+                                    console.log(`Tambah Data Order...`+idordernya);
+                                    req.kode = 201;
+                                    req.data = idordernya;
+                                    next();                    
+                                    });
                             });
                         });//end start insert
                     }
@@ -127,7 +142,8 @@ async function tambahOrder(req, res, next){
     }
 }
 
-//input paramater : token, iddetailorder
+//input paramater : token, iddetailorder, keterangan
+//output : 405 / 401 failed , 201 sukses
 //select idproduk sama dengan tambah order tetapi ditambah kondisi=2 (container cadangan)
 async function mutasicontainer(req, res, next){
     if(Object.keys(req.body).length != 8){
@@ -139,20 +155,29 @@ async function mutasicontainer(req, res, next){
             req.kode = 401;
             const token = req.body.token;
             const decode = jwt.verify(token, process.env.ACCESS_SECRET);
+            var datenow = { toSqlString: function() { return 'DATE(NOW())'; } };
             database.beginTransaction(function(err){
                 if (err) { throw err; }
-                database.query("select b.idproduk, idlokasi, idjenis_produk, tanggal_mulai, tanggal_akhir from `order` a, detail_order b, produk where a.idorder=b.idorder and b.idproduk=produk.idproduk and b.iddetail_order=? and a.status=0 and now() between tanggal_mulai and tanggal_akhir", req.body.iddetail_order, function(err,result){
+                database.query("select b.idproduk, idlokasi, idjenis_produk, tanggal_mulai, tanggal_akhir from `order` a, detail_order b, produk where a.idorder=b.idorder and b.idproduk=produk.idproduk and b.iddetail_order=? and a.status=0 and DATE(tanggal_akhir)>DATE(now())", req.body.iddetail_order, function(err,result){
                     if(err) { 
                         throw err; 
                     }else{
                         if(result.length<=0) {throw err;}
-                        database.query("SELECT idproduk from produk where idlokasi='${result[0].idlokasi}' and idjenis_produk='${result[0].idjenis_produk}' and (idkondisi=1 or idkondisi=2) and idlokasi = 1 AND idproduk NOT IN ( select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and '${database.escape(result[0].tanggal_mulai)}' between tanggal_mulai and tanggal_akhir UNION select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and '${database.escape(result[0].tanggal_akhir)}' between tanggal_mulai and tanggal_akhir) ORDER BY idkondisi, idproduk asc limit 1;", 
+                        database.query("SELECT idproduk from produk where idlokasi='${result[0].idlokasi}' and idjenis_produk='${result[0].idjenis_produk}' and (idkondisi=1 or idkondisi=2) and idlokasi = 1 AND idproduk NOT IN ( select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and now() between tanggal_mulai and tanggal_akhir UNION select idproduk from `order` a, detail_order b where a.idorder=b.idorder and a.status=0 and '${database.escape(result[0].tanggal_akhir)}' between tanggal_mulai and tanggal_akhir) ORDER BY idkondisi, idproduk asc limit 1;", 
                         [], function(err1, result1){
                             if(err1) {
                                 throw err1;
                             }
                             else{
                                 if(result1.length<=0) { throw err; }
+                                database.query("update produk set idkondisi=0 where idproduk='${result[0].idproduk}'",function(err, result){
+                                    if(err) { 
+                                        database.rollback(function(){
+                                            database.end;
+                                            throw err;
+                                        });
+                                    }
+                                });
                                 database.query("UPDATE detail_order set idproduk = '${result1[0].idproduk}' where iddetail_order=?", req.body.iddetail_order, function(err2, result2){
                                     if(err2){
                                         database.rollback(function(){
@@ -160,21 +185,48 @@ async function mutasicontainer(req, res, next){
                                             throw err;
                                         });
                                     }
+                                });
+
+                                let mutasidata = {
+                                    tanggal_mutasi : datenow,
+                                    idproduk_awal : result[0].idproduk,
+                                    idproduk_akhir : result1[0].idproduk,
+                                    iddetail_order : req.body.iddetail_order,
+                                    keterangan : req.body.keterangan,
+                                    timestamp : datenow
+                                }
+                                database.query("INSERT INTO mutasi set ?", mutasidata, function(err3, result3){   
+                                    if(err3){
+                                        database.rollback(function(){
+                                            database.end;
+                                            throw err;
+                                        });
+                                    } 
                                     else{
-                                        database.commit(function(err){
+                                        let logdata = {
+                                            keterangan : "Mutasi Container id : "+result3.insertId,
+                                            idpengguna: decode.idpengguna
+                                        }
+            
+                                        database.query('INSERT INTO log_aktifitas set ?', logdata, function(err, result1){
                                             if(err){
                                                 database.rollback(function(){
-                                                    database.end;
                                                     throw err;
                                                 });
                                             }
-                                            else{
+                                            database.commit(function(err){
+                                                if(err){
+                                                    console.log("Error Commit")
+                                                    database.rollback(function(){
+                                                        throw err;
+                                                    })
+                                                }
+                                                console.log(`Mutasi Container Sukses`);
                                                 req.kode = 201;
-                                                console.log("Mutasi container sukses");
-                                                database.end;
-                                                next()
-                                            }
-                                        });   
+                                                req.data = idordernya;
+                                                next();                    
+                                                });
+                                        });
                                     }
                                 });
                             }
